@@ -1,0 +1,10 @@
+# Plantilla para desarrollo local. Copia este archivo como `.dev.vars`
+# y rellena los valores con lo que imprima:  npm run clave
+#
+# `.dev.vars` está en .gitignore y nunca se sube ni se despliega.
+# En produccion los valores NO salen de aquí, sino de:
+#   npx wrangler secret put CLAVE_HASH
+#   npx wrangler secret put SECRETO_SESION
+
+CLAVE_HASH = "pbkdf2$30000$SAL_EN_BASE64URL$HASH_EN_BASE64URL"
+SECRETO_SESION = "CLAVE_ALEATORIA_EN_BASE64URL"

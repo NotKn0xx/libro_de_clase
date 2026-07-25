@@ -1,0 +1,22 @@
+name = "libro-clases"
+main = "src/index.js"
+compatibility_date = "2026-07-01"
+
+# El Worker se ejecuta primero para poder aplicar las cabeceras de seguridad
+# a todas las respuestas, incluidos los archivos estaticos.
+[assets]
+directory = "./public/"
+binding = "ASSETS"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "libro-clases"
+database_id = "0acf33c0-c47a-47f7-97a7-f947773830ee"
+
+[observability]
+enabled = true
+
+# Los secretos NO van en este archivo. Se cargan una sola vez con:
+#   npx wrangler secret put CLAVE_HASH       -> lo genera scripts/generar-clave.mjs
+#   npx wrangler secret put SECRETO_SESION   -> lo genera scripts/generar-clave.mjs

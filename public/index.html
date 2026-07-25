@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1E5A49">
+<meta name="robots" content="noindex,nofollow">
+<title>Libro de clases</title>
+<link rel="stylesheet" href="/app.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231E5A49'/><path d='M26 24h34a14 14 0 0 1 14 14v40a10 10 0 0 0-10-10H26z' fill='%23fff' opacity='.92'/></svg>">
+</head>
+<body>
+
+<!-- ===================== ENTRAR ===================== -->
+<div class="portada" id="portada">
+  <div class="caja-entrar">
+    <h1 class="titulo">Libro de clases</h1>
+    <p class="lema">Tus clases, tus fechas y lo que viene.</p>
+    <div class="tarjeta">
+      <form id="formEntrar" autocomplete="on">
+        <div class="error-entrar oculto" id="errorEntrar" role="alert"></div>
+        <div class="campo-form">
+          <label for="clave">Clave de acceso</label>
+          <input type="password" id="clave" name="password" autocomplete="current-password"
+                 required autofocus enterkeyhint="go">
+        </div>
+        <button type="submit" class="primario" id="botonEntrar">Entrar</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APLICACIÓN ===================== -->
+<div id="aplicacion" class="oculto">
+
+  <header class="cabecera">
+    <div class="cabecera-fila">
+      <h1 class="marca">Libro de clases <span id="nombreDocente"></span></h1>
+      <div class="fecha-hoy" id="fechaHoy"></div>
+    </div>
+    <nav class="pestanas" role="tablist" aria-label="Secciones">
+      <button class="pestana" role="tab" aria-selected="true"  data-vista="hoy">Hoy</button>
+      <button class="pestana" role="tab" aria-selected="false" data-vista="asignaturas">Mis asignaturas</button>
+      <button class="pestana" role="tab" aria-selected="false" data-vista="fechas">Fechas importantes</button>
+      <button class="pestana" role="tab" aria-selected="false" data-vista="ajustes">Ajustes</button>
+    </nav>
+  </header>
+
+  <main class="envoltorio">
+    <div class="cargando" id="cargando">Cargando tus datos…</div>
+
+    <section id="vista-hoy" class="oculto">
+      <h2>Lo que sigue en cada asignatura</h2>
+      <p class="sub">Esto es lo que anotaste como “materia de la próxima clase” la última vez que dictaste cada ramo.</p>
+      <div id="siguientes" class="rejilla dos"></div>
+
+      <h2>Fechas pendientes</h2>
+      <div class="tarjeta"><div id="fechasProximas" class="lista-fechas"></div></div>
+
+      <div class="acciones">
+        <button class="primario" data-accion="nueva-clase">Anotar una clase</button>
+        <button class="secundario" data-accion="nueva-fecha">Agregar fecha importante</button>
+      </div>
+    </section>
+
+    <section id="vista-asignaturas" class="oculto">
+      <h2>Mis asignaturas</h2>
+      <div id="listaAsignaturas" class="rejilla dos"></div>
+      <div class="acciones">
+        <button class="primario" data-accion="nueva-asignatura">Agregar asignatura</button>
+      </div>
+    </section>
+
+    <section id="vista-detalle" class="oculto">
+      <button class="enlace" data-accion="volver-asignaturas">← Volver a mis asignaturas</button>
+      <h2 id="detalleTitulo"></h2>
+      <p class="sub" id="detalleSub"></p>
+
+      <div class="acciones separadas">
+        <button class="primario" data-accion="nueva-clase-aqui">Anotar una clase</button>
+        <button class="secundario" data-accion="nueva-fecha-aqui">Agregar fecha</button>
+        <button class="secundario" data-accion="editar-asignatura">Editar asignatura</button>
+      </div>
+
+      <p class="eyebrow">Diario de clases</p>
+      <div class="tarjeta"><div id="detalleClases"></div></div>
+
+      <p class="eyebrow separado">Fechas de esta asignatura</p>
+      <div class="tarjeta"><div id="detalleFechas" class="lista-fechas"></div></div>
+    </section>
+
+    <section id="vista-fechas" class="oculto">
+      <h2>Fechas importantes</h2>
+      <div class="tarjeta"><div id="todasFechas" class="lista-fechas"></div></div>
+      <div class="acciones">
+        <button class="primario" data-accion="nueva-fecha">Agregar fecha importante</button>
+      </div>
+    </section>
+
+    <section id="vista-ajustes" class="oculto">
+      <h2>Tu nombre</h2>
+      <div class="tarjeta">
+        <div class="campo-form">
+          <label for="inputDocente">Aparece arriba, junto al título</label>
+          <input type="text" id="inputDocente" maxlength="80" placeholder="Por ejemplo: Prof. Sagredo">
+        </div>
+        <button class="secundario" data-accion="guardar-docente">Guardar nombre</button>
+      </div>
+
+      <h2>Copia de seguridad</h2>
+      <div class="tarjeta">
+        <p class="apagado">Tus datos están guardados en el servidor y los ves desde cualquier
+        dispositivo. Aun así, puedes descargar una copia para tenerla aparte.</p>
+        <button class="secundario" data-accion="exportar">Descargar copia</button>
+      </div>
+
+      <h2>Cerrar sesión</h2>
+      <div class="tarjeta">
+        <p class="apagado">Tendrás que escribir la clave la próxima vez.</p>
+        <button class="peligro" data-accion="salir">Cerrar sesión</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<!-- ===================== DIÁLOGOS ===================== -->
+
+<dialog id="dlgAsignatura">
+  <div class="dlg-cab"><h3 id="dlgAsigTitulo">Nueva asignatura</h3></div>
+  <div class="dlg-cuerpo">
+    <div class="campo-form">
+      <label for="asigNombre">Nombre de la asignatura</label>
+      <input type="text" id="asigNombre" maxlength="120" placeholder="Por ejemplo: Programación I">
+    </div>
+    <div class="dos-campos">
+      <div class="campo-form">
+        <label for="asigSigla">Sigla <span class="apagado">(opcional)</span></label>
+        <input type="text" id="asigSigla" maxlength="40" placeholder="TIPR01">
+      </div>
+      <div class="campo-form">
+        <label for="asigSeccion">Sección <span class="apagado">(opcional)</span></label>
+        <input type="text" id="asigSeccion" maxlength="40" placeholder="001V">
+      </div>
+    </div>
+  </div>
+  <div class="dlg-pie">
+    <button type="button" class="peligro oculto" id="asigEliminar">Eliminar</button>
+    <button type="button" class="secundario" data-cerrar>Cancelar</button>
+    <button type="button" class="primario" id="asigGuardar">Guardar</button>
+  </div>
+</dialog>
+
+<dialog id="dlgClase">
+  <div class="dlg-cab"><h3 id="dlgClaseTitulo">Anotar una clase</h3></div>
+  <div class="dlg-cuerpo">
+    <div id="claseRecordatorio" class="pista oculto"></div>
+    <div class="dos-campos">
+      <div class="campo-form">
+        <label for="claseAsig">Asignatura</label>
+        <select id="claseAsig"></select>
+      </div>
+      <div class="campo-form">
+        <label for="claseFecha">Fecha de la clase</label>
+        <input type="date" id="claseFecha">
+      </div>
+    </div>
+    <div class="campo-form">
+      <label for="claseUnidad">Unidad o tema <span class="apagado">(opcional)</span></label>
+      <input type="text" id="claseUnidad" maxlength="200" placeholder="Unidad 2 — Estructuras de control">
+    </div>
+    <div class="campo-form">
+      <label for="claseImpartido">¿Qué pasaste hoy?</label>
+      <textarea id="claseImpartido" maxlength="4000" placeholder="Condicionales if/else, ejercicios en clase"></textarea>
+    </div>
+    <div class="campo-form">
+      <label for="claseProximo">¿Qué sigue la próxima clase?</label>
+      <textarea id="claseProximo" maxlength="4000" placeholder="Ciclos while y for. Traer el ejercicio 4 resuelto."></textarea>
+    </div>
+    <div class="campo-form">
+      <label for="claseNotas">Observaciones <span class="apagado">(opcional)</span></label>
+      <textarea id="claseNotas" maxlength="4000" placeholder="Faltaron 3 alumnos. Revisar el proyector."></textarea>
+    </div>
+  </div>
+  <div class="dlg-pie">
+    <button type="button" class="peligro oculto" id="claseEliminar">Eliminar</button>
+    <button type="button" class="secundario" data-cerrar>Cancelar</button>
+    <button type="button" class="primario" id="claseGuardar">Guardar</button>
+  </div>
+</dialog>
+
+<dialog id="dlgFecha">
+  <div class="dlg-cab"><h3 id="dlgFechaTitulo">Agregar fecha importante</h3></div>
+  <div class="dlg-cuerpo">
+    <div class="dos-campos">
+      <div class="campo-form">
+        <label for="fechaAsig">Asignatura</label>
+        <select id="fechaAsig"></select>
+      </div>
+      <div class="campo-form">
+        <label for="fechaTipo">Tipo</label>
+        <select id="fechaTipo">
+          <option>Prueba</option>
+          <option>Presentación</option>
+          <option>Entrega</option>
+          <option>Examen</option>
+          <option>Taller</option>
+          <option>Salida a terreno</option>
+          <option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="campo-form">
+      <label for="fechaDesc">¿De qué se trata?</label>
+      <input type="text" id="fechaDesc" maxlength="300" placeholder="Solemne 1 — unidades 1 y 2">
+    </div>
+    <div class="dos-campos">
+      <div class="campo-form">
+        <label for="fechaCuando">Fecha</label>
+        <input type="date" id="fechaCuando">
+      </div>
+      <div class="campo-form">
+        <label for="fechaEstado">Estado</label>
+        <select id="fechaEstado">
+          <option>Pendiente</option>
+          <option>Realizada</option>
+          <option>Reprogramada</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="dlg-pie">
+    <button type="button" class="peligro oculto" id="fechaEliminar">Eliminar</button>
+    <button type="button" class="secundario" data-cerrar>Cancelar</button>
+    <button type="button" class="primario" id="fechaGuardar">Guardar</button>
+  </div>
+</dialog>
+
+<script src="/app.js"></script>
+</body>
+</html>

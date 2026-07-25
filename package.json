@@ -1,0 +1,17 @@
+{
+  "name": "libro-clases",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Libro de clases digital: panel personal para docentes.",
+  "scripts": {
+    "clave": "node scripts/generar-clave.mjs",
+    "esquema:local": "wrangler d1 execute libro-clases --local --file=./schema.sql",
+    "esquema:remoto": "wrangler d1 execute libro-clases --remote --file=./schema.sql",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}
