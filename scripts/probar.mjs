@@ -118,6 +118,32 @@ comprobar('rechaza asignatura inexistente',
 comprobar('rechaza recurso inexistente',
   (await pedir('/api/usuarios/' + uuid(), { metodo: 'PUT', cuerpo: {} })).estado === 404);
 
+console.log('\n— Archivar asignaturas —');
+{
+  const d = (await pedir('/api/datos')).datos;
+  const a = d.asignaturas.find((x) => x.id === idAsig);
+  comprobar('una asignatura nueva nace sin archivar', Number(a?.archivada) === 0, JSON.stringify(a));
+
+  await pedir('/api/asignaturas/' + idAsig, {
+    metodo: 'PUT', cuerpo: { nombre: 'Programación II', archivada: '1' },
+  });
+  const tras = (await pedir('/api/datos')).datos.asignaturas.find((x) => x.id === idAsig);
+  comprobar('se puede archivar', Number(tras?.archivada) === 1);
+  comprobar('archivar no borra sus clases',
+    (await pedir('/api/datos')).datos.clases.some((c) => c.asignatura_id === idAsig));
+
+  await pedir('/api/asignaturas/' + idAsig, {
+    metodo: 'PUT', cuerpo: { nombre: 'Programación II', archivada: '0' },
+  });
+  comprobar('se puede desarchivar',
+    Number((await pedir('/api/datos')).datos.asignaturas.find((x) => x.id === idAsig)?.archivada) === 0);
+
+  comprobar('rechaza un valor que no sea 0 o 1',
+    (await pedir('/api/asignaturas/' + idAsig, {
+      metodo: 'PUT', cuerpo: { nombre: 'X', archivada: 'si' },
+    })).estado === 400);
+}
+
 console.log('\n— Inyección SQL —');
 {
   const id = uuid();

@@ -69,6 +69,12 @@
       <div class="acciones">
         <button class="primario" data-accion="nueva-asignatura">Agregar asignatura</button>
       </div>
+
+      <div id="archivadas" class="archivadas oculto">
+        <h2>Semestres terminados</h2>
+        <p class="sub">Guardadas por si necesitas consultarlas. No aparecen en «Hoy».</p>
+        <div id="listaArchivadas" class="rejilla dos"></div>
+      </div>
     </section>
 
     <section id="vista-detalle" class="oculto">
@@ -143,6 +149,14 @@
         <label for="asigSeccion">Sección <span class="apagado">(opcional)</span></label>
         <input type="text" id="asigSeccion" maxlength="40" placeholder="001V">
       </div>
+    </div>
+    <div class="campo-casilla">
+      <label for="asigArchivada">
+        <input type="checkbox" id="asigArchivada">
+        <span>Ya terminó el semestre</span>
+      </label>
+      <p class="ayuda">Deja de aparecer en «Hoy» y en las fechas pendientes,
+      pero se conserva el diario completo por si lo necesitas después.</p>
     </div>
   </div>
   <div class="dlg-pie">

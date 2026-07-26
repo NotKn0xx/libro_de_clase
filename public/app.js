@@ -80,6 +80,9 @@
 
   const asigPorId = (id) => datos.asignaturas.find((a) => a.id === id) || null;
 
+  const archivada = (a) => Number(a?.archivada) === 1;
+  const activas = () => datos.asignaturas.filter((a) => !archivada(a));
+
   const ultimaClase = (asigId) => datos.clases
     .filter((c) => c.asignatura_id === asigId && c.fecha)
     .sort((a, b) => b.fecha.localeCompare(a.fecha))[0] || null;
@@ -113,8 +116,9 @@
      <button class="primario" data-accion="nueva-asignatura">Agregar mi primera asignatura</button></div>`;
 
   function pintarHoy() {
-    $('#siguientes').innerHTML = datos.asignaturas.length
-      ? datos.asignaturas.map((a) => {
+    const enCurso = activas();
+    $('#siguientes').innerHTML = enCurso.length
+      ? enCurso.map((a) => {
         const u = ultimaClase(a.id);
         const sigue = u?.proximo ? esc(u.proximo) : '';
         return `<article class="tarjeta siguiente">
@@ -127,9 +131,13 @@
               · <button class="enlace" data-abrir="${a.id}">ver diario</button></div>
           </article>`;
       }).join('')
-      : sinAsignaturas('Todavía no hay asignaturas cargadas.');
+      : sinAsignaturas(datos.asignaturas.length
+        ? 'Todas tus asignaturas están archivadas.'
+        : 'Todavía no hay asignaturas cargadas.');
 
-    const pendientes = fechasDe().filter((f) => f.estado !== 'Realizada').slice(0, 6);
+    const pendientes = fechasDe()
+      .filter((f) => f.estado !== 'Realizada' && !archivada(asigPorId(f.asignatura_id)))
+      .slice(0, 6);
     $('#fechasProximas').innerHTML = pendientes.length
       ? pendientes.map(filaFecha).join('')
       : '<p class="sin-datos">No hay fechas pendientes anotadas.</p>';
@@ -153,21 +161,36 @@
       </div>`;
   }
 
+  function tarjetaAsignatura(a) {
+    const nClases = datos.clases.filter((c) => c.asignatura_id === a.id).length;
+    const nPend = datos.fechas.filter((f) => f.asignatura_id === a.id && f.estado !== 'Realizada').length;
+    const meta = [a.sigla, a.seccion].filter(Boolean).join(' · ');
+    const fin = archivada(a);
+    return `<article class="tarjeta siguiente${fin ? ' archivada' : ''}">
+        <div class="ramo">${esc(a.nombre)}</div>
+        ${meta ? `<div class="meta">${esc(meta)}</div>` : ''}
+        ${fin ? '<div><span class="marca-archivada">semestre terminado</span></div>' : ''}
+        <div class="contenido">${nClases} ${nClases === 1 ? 'clase anotada' : 'clases anotadas'}${
+      fin ? '' : ` · ${nPend} ${nPend === 1 ? 'fecha pendiente' : 'fechas pendientes'}`}</div>
+        <div class="pie">
+          <button class="enlace" data-abrir="${a.id}">abrir diario →</button>
+          · <button class="enlace" data-editar="asignaturas:${a.id}">editar o eliminar</button>
+        </div>
+      </article>`;
+  }
+
   function pintarAsignaturas() {
-    $('#listaAsignaturas').innerHTML = datos.asignaturas.length
-      ? datos.asignaturas.map((a) => {
-        const nClases = datos.clases.filter((c) => c.asignatura_id === a.id).length;
-        const nPend = datos.fechas.filter((f) => f.asignatura_id === a.id && f.estado !== 'Realizada').length;
-        const meta = [a.sigla, a.seccion].filter(Boolean).join(' · ');
-        return `<article class="tarjeta siguiente">
-            <div class="ramo">${esc(a.nombre)}</div>
-            ${meta ? `<div class="meta">${esc(meta)}</div>` : ''}
-            <div class="contenido">${nClases} ${nClases === 1 ? 'clase anotada' : 'clases anotadas'}
-              · ${nPend} ${nPend === 1 ? 'fecha pendiente' : 'fechas pendientes'}</div>
-            <div class="pie"><button class="enlace" data-abrir="${a.id}">abrir diario →</button></div>
-          </article>`;
-      }).join('')
-      : sinAsignaturas('Aquí van los ramos que dictas este semestre.');
+    const enCurso = activas();
+    const terminadas = datos.asignaturas.filter(archivada);
+
+    $('#listaAsignaturas').innerHTML = enCurso.length
+      ? enCurso.map(tarjetaAsignatura).join('')
+      : sinAsignaturas(terminadas.length
+        ? 'No tienes asignaturas en curso.'
+        : 'Aquí van los ramos que dictas este semestre.');
+
+    $('#archivadas').classList.toggle('oculto', terminadas.length === 0);
+    $('#listaArchivadas').innerHTML = terminadas.map(tarjetaAsignatura).join('');
   }
 
   function pintarDetalle() {
@@ -238,7 +261,10 @@
       dialogo: 'dlgAsignatura', titulo: 'dlgAsigTitulo', foco: 'asigNombre',
       botones: { guardar: 'asigGuardar', eliminar: 'asigEliminar' },
       rotulos: ['Nueva asignatura', 'Editar asignatura'],
-      campos: { nombre: 'asigNombre', sigla: 'asigSigla', seccion: 'asigSeccion' },
+      campos: {
+        nombre: 'asigNombre', sigla: 'asigSigla',
+        seccion: 'asigSeccion', archivada: 'asigArchivada',
+      },
       requeridos: { nombre: 'Escribe el nombre de la asignatura' },
       confirmar: (o) => `¿Eliminar "${o.nombre}" y todas sus clases y fechas?`,
     },
@@ -296,8 +322,10 @@
     rellenarSelects(objeto ? objeto.asignatura_id : asigPreferida);
     $('#' + def.titulo).textContent = def.rotulos[objeto ? 1 : 0];
     for (const [campo, elemento] of Object.entries(def.campos)) {
-      if (valores[campo] !== undefined) $('#' + elemento).value = valores[campo];
-      else if (!SELECTORES_ASIGNATURA.includes(elemento)) $('#' + elemento).value = '';
+      const el = $('#' + elemento);
+      if (el.type === 'checkbox') { el.checked = String(valores[campo] ?? '0') === '1'; continue; }
+      if (valores[campo] !== undefined) el.value = valores[campo];
+      else if (!SELECTORES_ASIGNATURA.includes(elemento)) el.value = '';
     }
     $('#' + def.botones.eliminar).classList.toggle('oculto', !objeto);
 
@@ -310,7 +338,8 @@
     const def = FORMULARIOS[recurso];
     const cuerpo = {};
     for (const [campo, elemento] of Object.entries(def.campos)) {
-      cuerpo[campo] = $('#' + elemento).value.trim();
+      const el = $('#' + elemento);
+      cuerpo[campo] = el.type === 'checkbox' ? (el.checked ? '1' : '0') : el.value.trim();
     }
     for (const [campo, mensaje] of Object.entries(def.requeridos)) {
       if (!cuerpo[campo]) { $('#' + def.campos[campo]).focus(); avisar(mensaje, true); return; }

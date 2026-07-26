@@ -216,6 +216,34 @@ textarea{ min-height:88px; resize:vertical; line-height:1.5; }
 input:focus, select:focus, textarea:focus{ border-color:var(--pizarra-500); }
 .dos-campos{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 
+/* Casilla de verificación: área de clic grande, pensada para dedo y para
+   quien no apunta fino con el ratón. */
+.campo-casilla{
+  margin:4px 0 16px; padding:14px 16px;
+  background:var(--pizarra-100); border-radius:var(--r);
+}
+.campo-casilla label{
+  display:flex; align-items:center; gap:12px; cursor:pointer;
+  font-size:1.02rem; font-weight:600; color:var(--tinta); min-height:32px;
+}
+.campo-casilla input[type="checkbox"]{
+  width:26px; height:26px; min-height:26px; flex:0 0 auto;
+  accent-color:var(--pizarra-700); margin:0; padding:0; cursor:pointer;
+}
+.campo-casilla .ayuda{
+  margin:8px 0 0 38px; font-size:.88rem; color:var(--tinta-2); line-height:1.45;
+}
+
+/* Asignaturas archivadas */
+.archivadas{ margin-top:34px; }
+.tarjeta.archivada{ opacity:.72; }
+.tarjeta.archivada .ramo{ color:var(--tinta-2); }
+.marca-archivada{
+  display:inline-block; font-size:.72rem; font-weight:700; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--tinta-2);
+  background:var(--linea-suave); border-radius:999px; padding:3px 10px;
+}
+
 .pista{
   background:var(--pizarra-100); border-left:4px solid var(--pizarra-500);
   border-radius:0 var(--r) var(--r) 0; padding:13px 16px; margin-bottom:18px; font-size:.96rem;

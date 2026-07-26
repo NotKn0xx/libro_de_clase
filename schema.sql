@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS asignaturas (
   nombre      TEXT NOT NULL,
   sigla       TEXT NOT NULL DEFAULT '',
   seccion     TEXT NOT NULL DEFAULT '',
+  archivada   INTEGER NOT NULL DEFAULT 0,   -- 1 = semestre terminado
   creado      INTEGER NOT NULL
 );
 

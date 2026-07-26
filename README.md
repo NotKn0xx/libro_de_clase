@@ -102,6 +102,32 @@ Los datos no se tocan: el despliegue solo reemplaza el código.
 
 ---
 
+## Migraciones de la base de datos
+
+`schema.sql` siempre refleja el estado actual, así que una **instalación nueva** solo
+necesita `npm run esquema:remoto`. Las bases **ya creadas** necesitan además las
+migraciones de la carpeta `migraciones/`, en orden y una sola vez cada una:
+
+```bash
+npx wrangler d1 execute libro-clases --local  --file=./migraciones/001-archivar-asignaturas.sql
+npx wrangler d1 execute libro-clases --remote --file=./migraciones/001-archivar-asignaturas.sql
+```
+
+| Migración | Qué hace | Aplicada en producción |
+|---|---|---|
+| `001-archivar-asignaturas.sql` | Añade `asignaturas.archivada` para marcar semestres terminados | 26-07-2026 |
+
+Para saber si una base ya la tiene:
+
+```bash
+npx wrangler d1 execute libro-clases --remote --command "SELECT name FROM pragma_table_info('asignaturas');"
+```
+
+Las migraciones usan `ALTER TABLE ... ADD COLUMN` con valor por defecto, así que **no
+borran ni modifican datos existentes**.
+
+---
+
 ## Cambiar la clave
 
 Se puede cambiar las veces que quieras. Genera una nueva y súbela:

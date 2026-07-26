@@ -8,9 +8,10 @@ const RECURSOS = {
   asignaturas: {
     tope: 40,
     campos: {
-      nombre:  { texto: 120, requerido: true },
-      sigla:   { texto: 40 },
-      seccion: { texto: 40 },
+      nombre:    { texto: 120, requerido: true },
+      sigla:     { texto: 40 },
+      seccion:   { texto: 40 },
+      archivada: { bandera: true },
     },
   },
   clases: {
@@ -69,12 +70,17 @@ function validar(definicion, cuerpo) {
 
     if (bruto === undefined || bruto === null || bruto === '') {
       if (regla.requerido) throw new ErrorPeticion(400, `Falta el campo ${clave}.`);
-      limpio[clave] = '';
+      limpio[clave] = regla.bandera ? 0 : '';
       continue;
     }
     if (typeof bruto !== 'string') throw new ErrorPeticion(400, `El campo ${clave} debe ser texto.`);
 
     const valor = bruto.trim();
+    if (regla.bandera) {
+      if (valor !== '0' && valor !== '1') throw new ErrorPeticion(400, `El campo ${clave} solo admite 0 o 1.`);
+      limpio[clave] = Number(valor);
+      continue;
+    }
     if (regla.texto !== undefined) {
       if (valor.length > regla.texto) {
         throw new ErrorPeticion(400, `El campo ${clave} supera ${regla.texto} caracteres.`);
@@ -101,7 +107,7 @@ const json = (datos, estado = 200) =>
 
 async function leerTodo(db) {
   const [asignaturas, clases, fechas, ajustes] = await db.batch([
-    db.prepare('SELECT id, nombre, sigla, seccion FROM asignaturas ORDER BY creado'),
+    db.prepare('SELECT id, nombre, sigla, seccion, archivada FROM asignaturas ORDER BY archivada, creado'),
     db.prepare('SELECT id, asignatura_id, fecha, unidad, impartido, proximo, notas FROM clases ORDER BY fecha DESC'),
     db.prepare('SELECT id, asignatura_id, tipo, descripcion, fecha, estado FROM fechas ORDER BY fecha'),
     db.prepare('SELECT clave, valor FROM ajustes'),
